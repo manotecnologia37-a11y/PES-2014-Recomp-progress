@@ -412,6 +412,40 @@ Expected data to compare:
 If `mem[vi4+2]` (colour) is non-zero but `vf05` is zero at the SQ, the bug is in the VU
 path (LQ/branch). If `mem[vi4+2]` is zero, the bug is on the producer side (VIF/EE).
 
+### 12.1 Result of the trace (2026-11-12)
+
+The match vertex colour is zero **because the VU1 skinning program reads the material from the
+wrong place**, not because of VU1 interpreter accuracy:
+
+```
+0160: lq.xyzw vf01, 0(vi13)     ; vi13 = XITOP = VIF1 ITOP = 0x1E0
+...
+05b8: sq.xyzw vf01, 2(vi04)     ; write material -> record colour slot
+```
+
+- `XITOP vi13` moves the VIF1 **ITOP** (set by the `ITOP` VIFcode) into `vi13`. For the
+  skinning program (`MSCAL pc=0x10`) the ITOP is `0x1E0`; for the other program
+  (`MSCAL pc=0x140`) it is `0x3E0`.
+- The game uploads **one qword of zeros** to `0x1E0` (`UNPACK imm=0x01E0 num=1`) and the
+  neutral tint `(128,128,128,255)` + view constants to `0x1FD` (`imm=0x01FD num=3`).
+- So `lq vf01, 0(vi13)` loads `0x1E0` = `0.0`, and the record colour becomes `0`.
+
+Measured with `PES2014_MAT_TRACE=1` / `PES2014_SKIN_TRACE=1`:
+
+```
+[PES mat LQ] pc=160 vf1=0(vi13=1e0) val=0.000,0.000,0.000,0.000
+[PES skin SQ] pc=5b8 vf01 imm=2 ... val=0.000,0.000,0.000,0.000 vf01=0,0,0,0
+```
+
+Positions and normals are correct (skinning works): `SQ vf12 → -2211,-2173,47` and
+`SQ vf13 → -0.499,-0.865,0.015`. Only the material (vf01) is zero.
+
+**Conclusion:** the bug is on the producer side — the material the game intends to load from
+`ITOP` (`0x1E0`) is zero. Either the upload that should carry the per-model colour (the
+reference RGBAQ is `128,124,128,128`) is being dropped/zeroed, or the material lives at
+`ITOP+0x1D` (`0x1FD`) and the game actually reads it through a different pointer. This is a
+VIF1/upload issue, not a VU1-accuracy issue.
+
 ---
 
 ## 13. Resumo técnico em português
