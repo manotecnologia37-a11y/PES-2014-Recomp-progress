@@ -1,0 +1,15 @@
+﻿# ---------------------------------------------------------------------------
+# Replace <PES2014_DIR> with the ABSOLUTE path of your work folder, i.e. the
+# folder that contains "disc/" (the extracted game) and "output/".
+# Example:  input = "D:/pes2014/disc/SLES_556.76"
+# Use forward slashes "/" or escaped backslashes "\\".
+# ---------------------------------------------------------------------------
+[general]
+input = "<PES2014_DIR>/ranges/overlays/137-game-init.ovl.elf"
+output = "<PES2014_DIR>/ranges/overlays/code-137"
+single_file_output = false
+patch_syscalls = false
+patch_cop0 = true
+patch_cache = true
+entry_points = ["0xd2c500"]
+

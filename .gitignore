@@ -1,0 +1,48 @@
+# ---- game data (never commit) ----
+disc/
+mc0/
+mc1/
+IOP/
+*.iso
+*.ISO
+*.bin
+*.AFS
+*.PSS
+SLES_*.???
+SYSTEM.CNF
+ROMLIST.DIR
+
+# ---- emulator / capture artefacts ----
+*.gs
+*.gs.zst
+*.gs.xz
+*.png
+!docs/images/*.png
+
+# ---- build outputs ----
+build/
+out/
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.obj
+*.o
+*.exp
+
+# ---- generated code ----
+output/
+code-[0-9]*/
+batches/
+pes_overlay_[0-9][0-9]_[0-9][0-9][0-9].cpp
+ps2_recompiled_*.h
+register_functions.cpp
+
+# ---- logs and dumps ----
+*.log
+*.out
+*.err
+vu-code.bin
+vu-data-*.bin
+boot-vram-*.bin
